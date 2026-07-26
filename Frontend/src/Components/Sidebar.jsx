@@ -8,7 +8,7 @@ export default function Sidebar() {
       <Box sx={{ 
 
         color: "black",
-        bgcolor : "red",
+        bgcolor : "#FFFFFF",
         width : {xs : "0px",md : "250px"},
         display : {xs: "none", md : "block"},
         borderRight : "1px solid lightgray",
@@ -16,7 +16,7 @@ export default function Sidebar() {
         p : 2 
          }}>
           
-          <Button sx={{bgcolor : "black", color : "white", mt : 2}} disableRipple onClick={()=> navigate("/create-post")}><AddIcon/> Create Post</Button>
+          <Button sx={{bgcolor : "#1A1A1B", color : "white", mt : 2}} disableRipple onClick={()=> navigate("/create-post")}><AddIcon/> Create Post</Button>
         </Box>
     </>
   );

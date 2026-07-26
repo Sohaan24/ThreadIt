@@ -46,6 +46,7 @@ export default function AuthForm() {
   
     e.preventDefault() ;
     const isSuccess = await handleAuthentication(formData, isLogged) ;
+    setFormData({username : "", email : "", password :""}) ;
     
     if(isSuccess) {
       setOpen(false) ;

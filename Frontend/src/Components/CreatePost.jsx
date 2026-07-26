@@ -188,7 +188,7 @@ export default function CreatePost() {
               isSubmitting,
             }) => (
               <form onSubmit={handleSubmit}>
-                {/* Title / Caption */}
+                {/* Caption */}
                 <TextField
                   name="caption"
                   label="Title"
@@ -196,9 +196,9 @@ export default function CreatePost() {
                   margin="none"
                   value={values.caption}
                   onChange={handleChange}
-                  slotProps={{ maxLength: 300 }}
-                  helperText={`${values.caption.length}/300`}
-                  formhelpertextprops={{
+                  slotProps={{ htmlInput : {maxLength: 150} }}
+                  helperText={`${values.caption.length}/150`}
+                  FormHelperTextProps={{
                     sx: { textAlign: "right", mr: 0, color: "#878a8c" },
                   }}
                   sx={{
@@ -343,8 +343,33 @@ export default function CreatePost() {
                     mt: 2.5,
                     pt: 2,
                     borderTop: "1px solid #edeff1",
+                    gap : 3
                   }}
                 >
+                <Button
+                    variant="contained"
+                    onClick={()=> navigate("/")}
+                    sx={{
+                      px: 3.5,
+                      py: 0.9,
+                      bgcolor: "gray",
+                      borderRadius: 99,
+                      fontWeight: 700,
+                      fontSize: 14,
+                      textTransform: "none",
+                      boxShadow: "none",
+                      "&:hover": {
+                        bgcolor: "red",
+                        boxShadow: "none",
+                      },
+                      "&:disabled": {
+                        bgcolor: "#ffcab8",
+                        color: "#fff",
+                      },
+                    }}
+                  >
+                  Cancel
+                  </Button>
                   <Button
                     type="submit"
                     variant="contained"

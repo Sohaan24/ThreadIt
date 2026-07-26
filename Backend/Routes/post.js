@@ -40,28 +40,25 @@ router.post("/createPost",requireAuth, upload.single("image"), wrapAsync (async 
 }));
 
 
-
-router.get("/getPost/:userId",wrapAsync (async (req, res) => {
-  const { userId } = req.params;
-
-  const user = await UserModel.findById(userId) ;
-  if(!user){
-    return res.status(404).json({error : "User does not exist"}) ;
-  }
-  const allPosts = await PostModel.find({ author : userId}).sort({createdAt : -1});
-
-  res
-    .status(200)
-    .json({ message: "successfully fetch posts", posts: allPosts });
-}));
-
-
 router.get("/all", wrapAsync(async (req,res)=> {
 
   const allPosts = await PostModel.find().sort({createdAt : -1}).populate("author", "username") ;
 
   res.status(200).json({posts: allPosts }) ;
 }))
+
+router.get("/getPost/:postId", wrapAsync(async(req,res)=> {
+  const {postId} = req.params ;
+
+  const Post = await PostModel.findById(postId) ;
+
+  if(!Post) {
+    return res.status(404).json({error : "Post Not found"}) ;
+  }
+  
+
+  return res.status(200).json({msg : "post fetch successfully", post : Post}) ;
+}));
 
 router.put("/update/:postId",requireAuth, upload.single("image"),wrapAsync (async (req, res) => {
   const { postId } = req.params;
@@ -78,26 +75,30 @@ router.put("/update/:postId",requireAuth, upload.single("image"),wrapAsync (asyn
     return res.status(401).json({error : "Unauthorized access , You cannot edit another user's Post"}) ;
   }
   
-  let imageUrl ;
-  if(req.file) {
-    imageUrl = req.file.path ;
+  let finalImageUrl ;
+
+  if(req.body.removeImage === "true") {
+    finalImageUrl = null ;
+  }else if(req.file) {
+    finalImageUrl = req.file.path ;
+  }else {
+    finalImageUrl = post.imageUrl ;
   }
 
-  if(content && imageUrl) {
+  if(content && finalImageUrl) {
     return res.status(400).json({message : "Cannot add caption and Image Together"}) ;
   }
 
-  if(!content && !imageUrl) {
+  if(!content && !finalImageUrl) {
     return res.status(400).json({message : "Content or Image is required"}) ;
   }
-  
   
   const updatedPost = await PostModel.findByIdAndUpdate(
     postId,
     {
       content,
       caption: caption || "",
-      imageUrl : imageUrl || "" ,
+      imageUrl : finalImageUrl,
       author : user 
     },
     {returnDocument: 'after', runValidators: true },
@@ -116,7 +117,7 @@ router.patch("/vote/:postId",requireAuth, wrapAsync (async (req, res) => {
   const userId = req.user.id;
 
   const post = await PostModel.findById(postId);
-  if (!post) return status(404).json({ error: "post not found" });
+  if (!post) return res.status(404).json({ error: "post not found" });
 
   const hasUpvoted = post.upvotedBy.includes(userId);
   const hasDownvoted = post.downvotedBy.includes(userId);

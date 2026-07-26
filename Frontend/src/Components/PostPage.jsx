@@ -1,6 +1,7 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import api from "./axiosConfig";
 import { MyContext } from "./MyContext";
+import { useNavigate } from "react-router-dom";
 
 import {
   Card,
@@ -21,20 +22,35 @@ import ModeCommentIcon from "@mui/icons-material/ModeComment";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
+
 export default function PostPage({ post, onDelete }) {
   const { user } = useContext(MyContext);
 
   const [upvoteCount, setUpvoteCount] = useState(post?.upvotedBy?.length || 0);
-  const [downvoteCount, setDownvoteCount] = useState(
-    post?.downvotedBy?.length || 0,
-  );
+  const [downvoteCount, setDownvoteCount] = useState(post?.downvotedBy?.length || 0);
 
-  const [hasUp, setHasUp] = useState(
-    post?.upvotedBy?.includes(user?._id) || false,
-  );
-  const [hasDown, setHasDown] = useState(
-    post?.downvotedBy?.includes(user?._id) || false,
-  );
+  const [hasUp, setHasUp] = useState(false);
+  const [hasDown, setHasDown] = useState(false);
+  const navigate = useNavigate()
+
+  useEffect(()=> {
+    if(!post) return ;
+    
+
+    setUpvoteCount(post.upvotedBy?.length || 0) ;
+    setDownvoteCount(post.downvotedBy?.length || 0) ; 
+
+    if (!user) {
+      setHasUp(false ) ;
+      setHasDown(false) ;
+      return;
+    }
+
+    setHasUp(post.upvotedBy.includes(user.id) ?? false) ;
+    setHasDown(post.downvotedBy.includes(user.id) ?? false) ;
+    
+
+  },[post, user])
 
   const handleVote = async (type) => {
     if (!user) {
@@ -81,6 +97,9 @@ export default function PostPage({ post, onDelete }) {
       const data = response.data;
 
       setUpvoteCount(data.upvoteCount);
+      setDownvoteCount(data.downvoteCount);
+      setHasUp(data.hasUpvoted);
+      setHasDown(data.hasDownvoted);
     } catch (error) {
       console.log("failed to update votes", error);
 
@@ -150,7 +169,10 @@ export default function PostPage({ post, onDelete }) {
   }
   return (
     <>
-      <Card sx={{ mb: 3, borderRadius: 2, boxShadow: 3 }}>
+      <Card sx={{ mb: 3, borderRadius: 2, boxShadow: 0 , transition: "box-shadow 0.2s ease, transform 0.2s ease",
+      "&:hover": {
+        boxShadow: 4, 
+      }, }}>
         <CardHeader
           avatar={
             <Avatar sx={{ bgcolor: stringToColor(username), color: "#FFFFFF" }}>
@@ -162,7 +184,7 @@ export default function PostPage({ post, onDelete }) {
           action={
             post?.author?._id === user?.id ? (
               <Box sx={{ gap: 3 }}>
-                <IconButton>
+                <IconButton onClick={()=> navigate(`/edit-post/${post._id}`)}>
                   <ModeEditIcon />
                 </IconButton>
                 <IconButton>

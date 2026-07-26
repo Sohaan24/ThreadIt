@@ -1,7 +1,7 @@
 import {useState, useEffect} from "react" ;
 import {Box} from "@mui/material" ;
 import PostPage from "./PostPage";
-import api from 'axios';
+import api from './axiosConfig';
 
 
 export default function Feed() {
@@ -11,7 +11,7 @@ export default function Feed() {
 
         const fetchData = async()=> {
             try{
-                const response = await api.get("http://localhost:3000/api/post/all") ;
+                const response = await api.get("/api/post/all") ;
                 setAllPosts(response.data.posts) ;
                
             }catch(error){
@@ -31,7 +31,7 @@ export default function Feed() {
     
     return (
         <>
-            <Box sx= {{display : "flex", flexGrow : 1, color : "black", p : {xs : 2, md : 4}, overflowY : "auto"}}>
+            <Box sx= {{display : "flex", flexGrow : 1, color : "black", bgcolor : "#F5F6F7", p : {xs : 2, md : 4}, overflowY : "auto"}}>
                 <Box sx={{maxWidth : "400px", width : "100%", mx : "auto"}}>
                     { allPosts && allPosts.map((post)=>(
                         <PostPage key={post._id} post = {post} onDelete={handlePostDeleted}/>
