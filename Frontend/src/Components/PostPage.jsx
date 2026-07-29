@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import {useContext } from "react";
 import api from "./axiosConfig";
 import { MyContext } from "./MyContext";
 import { useNavigate } from "react-router-dom";
@@ -18,111 +18,18 @@ import {
 
 
 import { ArrowBigUp, ArrowBigDown, MessageCircle, Pen, Trash2 } from 'lucide-react';
+import useHelper from "../utils/useHelper" ;
+import useVote from "../hooks/useVote" ;
+
 
 
 export default function PostPage({ post, onDelete }) {
   const { user } = useContext(MyContext);
+  const {hasUp,hasDown, upvoteCount,handleVote} = useVote(post) ;
+  const navigate = useNavigate() ;
+  const{timeAgo, stringToColor} = useHelper() ;
 
-  const [upvoteCount, setUpvoteCount] = useState(post?.upvotedBy?.length || 0);
-  const [downvoteCount, setDownvoteCount] = useState(
-    post?.downvotedBy?.length || 0,
-  );
 
-  const [hasUp, setHasUp] = useState(false);
-  const [hasDown, setHasDown] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!post) return;
-
-    setUpvoteCount(post.upvotedBy?.length || 0);
-    setDownvoteCount(post.downvotedBy?.length || 0);
-
-    if (!user) {
-      setHasUp(false);
-      setHasDown(false);
-      return;
-    }
-
-    setHasUp(post.upvotedBy.includes(user.id) ?? false);
-    setHasDown(post.downvotedBy.includes(user.id) ?? false);
-  }, [post, user]);
-
-  const handleVote = async (type) => {
-    if (!user) {
-      console.log("please log in to vote");
-      return;
-    }
-    const prevUp = upvoteCount;
-    const prevDown = downvoteCount;
-    const prevHasUp = hasUp;
-    const prevHasDown = hasDown;
-
-    if (type === "up") {
-      if (hasUp) {
-        setUpvoteCount((prev) => prev - 1);
-        setHasUp(false);
-      } else {
-        setUpvoteCount((prev) => prev + 1);
-        setHasUp(true);
-      }
-
-      if (hasDown) {
-        setHasDown(false);
-      }
-    } else {
-      if (type === "down") {
-        if (hasDown) {
-          setHasDown(false);
-        } else {
-          setHasDown(true);
-        }
-
-        if (hasUp) {
-          setHasUp(false);
-          setUpvoteCount((prev) => prev - 1);
-        }
-      }
-    }
-
-    try {
-      const response = await api.patch(`/api/post/vote/${post._id}`, {
-        voteType: type,
-      });
-
-      const data = response.data;
-
-      setUpvoteCount(data.upvoteCount);
-      setDownvoteCount(data.downvoteCount);
-      setHasUp(data.hasUpvoted);
-      setHasDown(data.hasDownvoted);
-    } catch (error) {
-      console.log("failed to update votes", error);
-
-      setUpvoteCount(prevUp);
-      setDownvoteCount(prevDown);
-      setHasUp(prevHasUp);
-      setHasDown(prevHasDown);
-    }
-  };
-
-  function stringToColor(string) {
-    let hash = 0;
-    let i;
-
-    for (i = 0; i < string.length; i += 1) {
-      hash = string.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    let color = "#";
-
-    for (i = 0; i < 3; i += 1) {
-      const value = (hash >> (i * 8)) & 0xff;
-      color += `00${value.toString(16)}`.slice(-2);
-    }
-
-    return color;
-  }
   const username = post?.author?.username || "Unknown";
 
   const handleDeletePost = async () => {
@@ -134,35 +41,12 @@ export default function PostPage({ post, onDelete }) {
       console.log("Failed to delete Post", error);
     }
   };
-  function timeAgo(dateString) {
-    if (!dateString) return "Just now";
 
-    const date = new Date(dateString);
-    const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
-
-    let interval = Math.floor(seconds / 31536000);
-    if (interval >= 1)
-      return interval + " year" + (interval === 1 ? "" : "s") + " ago";
-
-    interval = Math.floor(seconds / 2592000);
-    if (interval >= 1)
-      return interval + " month" + (interval === 1 ? "" : "s") + " ago";
-
-    interval = Math.floor(seconds / 86400);
-    if (interval >= 1)
-      return interval + " day" + (interval === 1 ? "" : "s") + " ago";
-
-    interval = Math.floor(seconds / 3600);
-    if (interval >= 1)
-      return interval + " hour" + (interval === 1 ? "" : "s") + " ago";
-
-    interval = Math.floor(seconds / 60);
-    if (interval >= 1)
-      return interval + " min" + (interval === 1 ? "" : "s") + " ago";
-
-    return "Just now";
+  const showPost= ()=> {
+   
+    navigate(`/show-post/${post._id}`);
   }
+  
   return (
     <>
       <Card
@@ -174,14 +58,17 @@ export default function PostPage({ post, onDelete }) {
           boxShadow: "none",
           overflow: "hidden",
           transition: "box-shadow 0.25s ease, transform 0.25s ease",
+          cursor : "pointer",
           "&:hover": {
             boxShadow: "0 12px 28px rgba(0,0,0,0.08)",
             transform: "translateY(-2px)",
           },
         }}
+        onClick={showPost}
       >
         <CardHeader
           sx={{ pb: 1 }}
+          
           avatar={
             <Avatar
               sx={{
@@ -211,7 +98,8 @@ export default function PostPage({ post, onDelete }) {
               <Box sx={{ display: "flex", gap: 0.5, pt: 0.5 }}>
                 <IconButton
                   size="small"
-                  onClick={() => navigate(`/edit-post/${post._id}`)}
+                  
+                  onClick={(e) =>{e.stopPropagation(); navigate(`/edit-post/${post._id}`)}}
                   sx={{
                     color: "text.secondary",
                     "&:hover": {
@@ -224,7 +112,7 @@ export default function PostPage({ post, onDelete }) {
                 </IconButton>
                 <IconButton
                   size="small"
-                  onClick={handleDeletePost}
+                  onClick={(e)=> {e.stopPropagation(); handleDeletePost() }}
                   sx={{
                     color: "#E53935",
                     "&:hover": { bgcolor: "rgba(229,57,53,0.08)" },
@@ -309,7 +197,7 @@ export default function PostPage({ post, onDelete }) {
           >
             <IconButton
               size="small"
-              onClick={() => handleVote("up")}
+              onClick={(e) =>{e.stopPropagation() ; handleVote("up")} }
               sx={{
                 color: hasUp ? "#FF4500" : "#878A8C",
                 bgcolor: hasUp ? "rgba(255,69,0,0.12)" : "transparent",
@@ -330,7 +218,7 @@ export default function PostPage({ post, onDelete }) {
             </Typography>
             <IconButton
               size="small"
-              onClick={() => handleVote("down")}
+              onClick={(e) =>{e.stopPropagation(); handleVote("down") } }
               sx={{
                 color: hasDown ? "#0079D3" : "#878A8C",
                 bgcolor: hasDown ? "rgba(0,121,211,0.12)" : "transparent",
@@ -353,7 +241,7 @@ export default function PostPage({ post, onDelete }) {
               "&:hover": { bgcolor: "action.selected" },
             }}
           >
-            <IconButton size="small" sx={{ p: 0.3, color: "#878A8C" }}>
+            <IconButton size="small" sx={{ p: 0.3, color: "#878A8C" }} onClick={(e)=> {e.stopPropagation();}}>
               <MessageCircle fontSize="small" />
             </IconButton>
             <Typography

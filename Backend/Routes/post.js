@@ -50,7 +50,7 @@ router.get("/all", wrapAsync(async (req,res)=> {
 router.get("/getPost/:postId", wrapAsync(async(req,res)=> {
   const {postId} = req.params ;
 
-  const Post = await PostModel.findById(postId) ;
+  const Post = await PostModel.findById(postId).populate("author", "username") ;
 
   if(!Post) {
     return res.status(404).json({error : "Post Not found"}) ;
