@@ -6,6 +6,8 @@ import { IconButton, Box, CircularProgress } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import CommentForm from "./Comment/CommentForm" ;
+import RenderComment from "./Comment/RenderComment";
+
 
 export default function ShowPost() {
   const navigate = useNavigate();
@@ -51,6 +53,8 @@ export default function ShowPost() {
       <Box sx={{ width: "80%", display: "flex", alignItems : "center", mt : 5, flexDirection : "column"}}>
         <PostPage post={post} />
         <CommentForm postId = {post._id}/>
+        <RenderComment postId = {post._id}/>
+
         
       </Box>
     </Box>

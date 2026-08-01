@@ -7,57 +7,6 @@ const requireAuth = require("../Middleware/requireAuth") ;
 const wrapAsync = require("../Utils/wrapAsync") ;
 
 
-router.get("/getThread/:postId",wrapAsync (async(req, res)=> {
-   try {
-    const topComments = await Comment.aggregate([
-        
-        {
-            $match : {
-                postId : new mongoose.Types.ObjectId(req.params.postId),
-                parentId : null, 
-            }
-        },
-        {$sort : {_id : -1}},
-        {$limit : 10},
-
-        {
-            $lookup : {
-                from : "comments",
-                let : {"currId" : "$_id"},
-
-                pipeline :[
-                    {
-                        $match : {
-                            $expr : {$eq : ["$parentId", "$$currId"]},
-                        },
-                    },
-
-                    {$sort : {_id : -1}} ,
-                    {$limit : 3} ,
-
-                    {
-                        $project : {
-                            text : 1, authorName : 1, upvote : 1, createdAt : 1
-                        },
-                        
-                    }
-                ],
-                as : "replies",
-            }
-        },
-        {
-            $project : {
-                text : 1, authorName : 1, upvote : 1, replies : 1, createdAt : 1
-            }
-        }
-    ]);
-
-    res.status(200).json(topComments);
-
-   }catch(err){
-    res.status(500).json({error : err.message}) ;
-   }
-}));
 
 router.post("/createThread", requireAuth,wrapAsync (async(req,res)=> {
 
@@ -88,6 +37,37 @@ router.post("/createThread", requireAuth,wrapAsync (async(req,res)=> {
         
     });
     res.status(201).json(savedComment) ;
+}));
+
+
+router.get("/getThread/:postId",wrapAsync (async(req, res)=> {
+    const {postId} = req.params ;
+
+   const comments = await Comment.find({postId}).sort({createdAt : -1}).lean() ;
+
+   const commentMap = {} ;
+   const rootComments = [] ;
+
+   comments.forEach(c => {c.replies = [] ;
+    commentMap[c._id.toString()] = c ;
+    
+   }) ;
+
+   comments.forEach(c=> {
+    if(c.parentId) {
+        const parent = commentMap[c.parentId.toString()] ;
+
+        if(parent) {
+            parent.replies.push(c) ;
+        }
+    }else {
+        rootComments.push(c) ;
+        }
+   }) ;
+
+   res.status(200).json(rootComments) ;
+
+
 }));
 
 router.delete("/deleteThread/:commentId",requireAuth, wrapAsync (async(req,res)=> {

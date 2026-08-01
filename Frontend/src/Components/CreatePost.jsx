@@ -52,7 +52,7 @@ export default function CreatePost() {
         otherwise: (schema) =>
           schema.required("Provide some content or upload an image"),
       }),
-      image: Yup.mixed().when("content", {
+      image: Yup.mixed().nullable().when("content", {
         is: (content) => content && content.trim() !== "",
         then: (schema) =>
           schema.test(
@@ -162,6 +162,8 @@ export default function CreatePost() {
               const formData = new FormData();
               formData.append("caption", values.caption);
               formData.append("content", values.content);
+              console.log(Object.fromEntries(formData));
+              
               if (values.image) formData.append("image", values.image);
 
               try {
@@ -198,7 +200,7 @@ export default function CreatePost() {
                   onChange={handleChange}
                   slotProps={{ htmlInput : {maxLength: 150} }}
                   helperText={`${values.caption.length}/150`}
-                  FormHelperTextProps={{
+                  formhelpertextprops={{
                     sx: { textAlign: "right", mr: 0, color: "#878a8c" },
                   }}
                   sx={{
