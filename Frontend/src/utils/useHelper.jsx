@@ -47,5 +47,10 @@ export default function useHelper() {
     return "Just now";
   }
 
-  return {stringToColor, timeAgo}
+  function countReplies(comment) {
+    if (!comment.replies?.length) return 0;
+    return comment.replies.reduce((sum, r) => sum + 1 + countReplies(r), 0);
+  }
+
+  return {stringToColor, timeAgo, countReplies}
 }

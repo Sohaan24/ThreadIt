@@ -17,6 +17,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import * as Yup from "yup";
 import api from "./axiosConfig";
 import {MyContext} from "./MyContext";
+import {toast} from "react-toastify" ;
 
 export default function EditPost() {
 
@@ -83,6 +84,7 @@ export default function EditPost() {
 
           try {
             await api.put(`/api/post/update/${postId}`, formData) ;
+            toast.success("Post Edited") ;
             navigate("/") ;
             
           }catch(err) {

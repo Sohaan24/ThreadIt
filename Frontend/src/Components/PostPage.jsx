@@ -2,6 +2,7 @@ import {useContext } from "react";
 import api from "./axiosConfig";
 import { MyContext } from "./MyContext";
 import { useNavigate } from "react-router-dom";
+import {toast} from "react-toastify" ;
 
 import {
   Card,
@@ -21,8 +22,6 @@ import { ArrowBigUp, ArrowBigDown, MessageCircle, Pen, Trash2 } from 'lucide-rea
 import useHelper from "../utils/useHelper" ;
 import useVote from "../hooks/useVote" ;
 
-
-
 export default function PostPage({ post, onDelete }) {
   const { user } = useContext(MyContext);
   const {hasUp,hasDown, upvoteCount,handleVote} = useVote(post) ;
@@ -33,10 +32,11 @@ export default function PostPage({ post, onDelete }) {
   const username = post?.author?.username || "Unknown";
 
   const handleDeletePost = async () => {
-    console.log("post id ", post._id);
+   
     try {
       await api.delete(`/api/post/delete/${post._id}`);
       onDelete(post._id);
+      toast.success("Post Deleted Succesfully") ;
     } catch (error) {
       console.log("Failed to delete Post", error);
     }

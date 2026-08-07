@@ -28,11 +28,10 @@ export default function Feed() {
     }
 
     
-    
     return (
         <>
             <Box sx= {{display : "flex", flexGrow : 1, color : "black", bgcolor : "#F5F6F7", p : {xs : 2, md : 4}, overflowY : "auto"}}>
-                <Box sx={{maxWidth : "400px", width : "100%", mx : "auto"}}>
+                <Box sx={{maxWidth : "500px", width : "100%", mx : "auto"}}>
                     { allPosts && allPosts.map((post)=>(
                         <PostPage key={post._id} post = {post} onDelete={handlePostDeleted}/>
                     ))}

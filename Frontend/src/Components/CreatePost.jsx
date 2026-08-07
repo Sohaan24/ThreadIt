@@ -17,12 +17,14 @@ import ImageIcon from "@mui/icons-material/Image";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import * as Yup from "yup";
 import api from "./axiosConfig";
+import {toast} from "react-toastify" ;
 
 export default function CreatePost() {
   const { user } = useContext(MyContext);
   const [activeTab, setActiveTab] = useState("text"); // "text" | "image"
   const [previewUrl, setPreviewUrl] = useState(null);
   const navigate = useNavigate() ;
+  console.log(user) ;
   if (!user) {
     return (
       <Box
@@ -162,7 +164,6 @@ export default function CreatePost() {
               const formData = new FormData();
               formData.append("caption", values.caption);
               formData.append("content", values.content);
-              console.log(Object.fromEntries(formData));
               
               if (values.image) formData.append("image", values.image);
 
@@ -171,7 +172,7 @@ export default function CreatePost() {
                 resetForm();
                 setPreviewUrl(null);
                 setActiveTab("text");
-
+                toast.success("Post Created Succesfully")
                 navigate("/") ;
               } catch (err) {
                 console.log("Failed to create Post", err);

@@ -9,6 +9,7 @@ import {
   TextField,
   Stack,
 } from "@mui/material";
+import {toast} from "react-toastify" ;
 
 export default function AuthForm() {
   const style = {
@@ -46,6 +47,10 @@ export default function AuthForm() {
   
     e.preventDefault() ;
     const isSuccess = await handleAuthentication(formData, isLogged) ;
+    
+    if(isSuccess) {
+      toast.success(`Welcome User`) ;
+    }
     setFormData({username : "", email : "", password :""}) ;
     
     if(isSuccess) {

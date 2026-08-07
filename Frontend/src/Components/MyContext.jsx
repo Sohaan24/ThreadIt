@@ -1,5 +1,6 @@
 import { useContext, useState } from "react";
 import { createContext } from "react";
+import {toast} from "react-toastify" ;
 import api from "./axiosConfig";
 
 export const MyContext = createContext();
@@ -32,7 +33,7 @@ export const MyProvider = ({ children }) => {
 
       setUser(null);
 
-      console.log("Successfully logged out");
+      toast.info("User logged Out") ;
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {

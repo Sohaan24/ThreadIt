@@ -1,23 +1,33 @@
 import MainLayout from "./Components/MainLayout";
-import Feed from "./Components/Feed" ;
-import CreatePost from "./Components/CreatePost" ;
-import {Routes, Route} from "react-router-dom" ;
+import Feed from "./Components/Feed";
+import CreatePost from "./Components/CreatePost";
+import { Routes, Route } from "react-router-dom";
 import EditPost from "./Components/EditPost";
-import ShowPost from "./Components/ShowPost" ;
-import "./App.css" ;
+import ShowPost from "./Components/ShowPost";
+import { ToastContainer } from "react-toastify";
+import "./App.css";
 
 function App() {
   return (
     <>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        pauseOnHover
+        theme="light"
+      />
       <Routes>
-        <Route element = {<MainLayout/>}>
-          <Route path="/" element = {<Feed/>}></Route>
-          <Route path="/create-post" element = {<CreatePost/>}></Route>
-          <Route path="/edit-post/:postId" element = {<EditPost/>}></Route>
-          <Route path= "/show-post/:postId" element = {<ShowPost/>}></Route>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Feed />}></Route>
+          <Route path="/create-post" element={<CreatePost />}></Route>
+          <Route path="/edit-post/:postId" element={<EditPost />}></Route>
+          <Route path="/show-post/:postId" element={<ShowPost />}></Route>
         </Route>
-        
-
       </Routes>
     </>
   );
