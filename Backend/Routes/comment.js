@@ -28,6 +28,8 @@ router.post("/createThread", requireAuth,wrapAsync (async(req,res)=> {
         
     }
 
+    await PostModel.findByIdAndUpdate(postId, {$inc : {commentCount : 1}}) ;
+
     const savedComment = await Comment.create({
         text,
         postId,
@@ -66,11 +68,53 @@ router.get("/getThread/:postId",wrapAsync (async(req, res)=> {
    }) ;
 
    res.status(200).json(rootComments) ;
-
-
 }));
 
-router.delete("/deleteThread/:commentId",requireAuth, wrapAsync (async(req,res)=> {
+router.patch("/vote/:commentId",requireAuth, wrapAsync (async (req, res) => {
+  const { commentId } = req.params;
+  const { voteType } = req.body;
+  const userId = req.user.id;
+
+  const comment = await Comment.findById(commentId);
+  if (!comment) return res.status(404).json({ error: "comment not found" });
+
+  const hasUpvoted = comment.upvotedBy.includes(userId);
+  const hasDownvoted = comment.downvotedBy.includes(userId);
+
+  let updateQuery = {};
+
+  if (voteType === "up") {
+    if (hasUpvoted) {
+      updateQuery = { $pull: { upvotedBy: userId } };
+    } else {
+      updateQuery = {
+        $push: { upvotedBy: userId },
+        $pull: { downvotedBy: userId },
+      };
+    }
+  } else if (voteType === "down") {
+    if (hasDownvoted) {
+      updateQuery = { $pull: { downvotedBy: userId } };
+    } else {
+      updateQuery = {
+        $push: { downvotedBy: userId },
+        $pull: { upvotedBy: userId },
+      };
+    }
+  }
+  const updatedComment = await Comment.findByIdAndUpdate(commentId, updateQuery, {
+    returnDocument: 'after',
+  });
+
+  return res.status(200).json({
+    upvoteCount:  updatedComment.upvotedBy.length,
+    downvoteCount:  updatedComment.downvotedBy.length,
+    hasUpvoted: updatedComment.upvotedBy.includes(userId),
+    hasDownvoted: updatedComment.downvotedBy.includes(userId),
+  });
+}));
+
+router.patch("/deleteThread/:commentId",requireAuth, wrapAsync (async(req,res)=> {
     const {commentId} = req.params ;
     const user = req.user.id ;
 
@@ -84,7 +128,7 @@ router.delete("/deleteThread/:commentId",requireAuth, wrapAsync (async(req,res)=
             text : "[deleted]",
             authorName : "[deleted]"
         },
-        {new :true }
+        {returnDocument: 'after', runValidators: true },
     ) ;
 
     if(!deletedThread) {
@@ -108,10 +152,7 @@ router.patch("/updateThread/:commentId",requireAuth, wrapAsync (async(req,res)=>
     const updatedThread = await Comment.findByIdAndUpdate(commentId, 
         
         {text},
-        {
-            new : true,
-            runValidators : true,
-        }
+        {returnDocument: 'after', runValidators: true },
     ) ;
 
     if(!updatedThread) {

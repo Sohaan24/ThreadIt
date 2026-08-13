@@ -32,7 +32,6 @@ router.post("/createPost",requireAuth, upload.single("image"), wrapAsync (async 
     author: req.user.id,
     imageUrl : imageUrl || ""
   });
-
   
   res
     .status(201)
