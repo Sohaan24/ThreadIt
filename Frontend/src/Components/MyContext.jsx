@@ -17,10 +17,19 @@ export const MyProvider = ({ children }) => {
       const endpoint = isLoginMode ? "/api/auth/login" : "/api/auth/signup";
 
       const response = await api.post(endpoint, formData);
-      setUser(response.data.user);
+      if(isLoginMode) {
+        setUser(response.data.user);
+
+      }
+      if(!isLoginMode) {
+        toast.info("Sign up successfully please log in") ;
+      }
+      
       return true;
     } catch (e) {
       setError(e.response?.data.error || e.response?.data.message || "Authentication Failed");
+  
+      return false ;
     } finally {
       setIsLoading(false);
     }

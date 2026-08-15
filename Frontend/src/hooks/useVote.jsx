@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import api from "../Components/axiosConfig";
 import { MyContext } from "../Components/MyContext";
+import {toast} from "react-toastify" ;
 export default function useVote(post) {
   const { user } = useContext(MyContext);
 
@@ -30,7 +31,7 @@ export default function useVote(post) {
 
   const handleVote = async (type) => {
     if (!user) {
-      console.log("please log in to vote");
+      toast.warning("Please log in to vote")
       return;
     }
     const prevUp = upvoteCount;

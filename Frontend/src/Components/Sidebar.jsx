@@ -1,4 +1,4 @@
-import { Box,Button,IconButton} from "@mui/material";
+import { Box,Button} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import {useNavigate} from  "react-router-dom" ;
 import {useContext} from "react" ;
@@ -11,21 +11,63 @@ export default function Sidebar() {
 
 
   return (
-    <>
-      <Box sx={{ 
-
+  <>
+    <Box
+      sx={{
         color: "black",
-        bgcolor : "#FFFFFF",
-        width : {xs : "0px",md : "250px"},
-        display : {xs: "none", md : "block"},
-        borderRight : "1px solid lightgray",
-        height : "100%",
-        p : 2, 
-        
-         }}>
-         <Button sx={{bgcolor : "#1A1A1B", color : "white", mt : 2}} disableRipple onClick={()=> navigate("/create-post")}><AddIcon/>Create</Button>
-         {user && <Button sx={{bgcolor : "#1A1A1B", color : "white", mt : 2}} disableRipple  onClick={handleLogout}><LogOut/>Log Out</Button>}
-        </Box>
-    </>
-  );
+        bgcolor: "#FFFFFF",
+        width: { xs: "0px", md: "250px" },
+        display: { xs: "none", md: "block" },
+        borderRight: "1px solid #EDEFF1",
+        height: "100%",
+        p: 2,
+      }}
+    >
+      <Button
+        fullWidth
+        disableRipple
+        onClick={() => navigate("/create-post")}
+        startIcon={<AddIcon />}
+        sx={{
+          bgcolor: "#FF4500",
+          color: "#FFFFFF",
+          textTransform: "none",
+          fontFamily: "'Inter', sans-serif",
+          fontWeight: 700,
+          fontSize: "0.88rem",
+          borderRadius: 5,
+          py: 0.9,
+          mt :2,
+          "&:hover": { bgcolor: "#D33600" },
+        }}
+      >
+        Create
+      </Button>
+
+      {user && (
+        <Button
+          fullWidth
+          disableRipple
+          onClick={handleLogout}
+          startIcon={<LogOut size={16} />}
+          sx={{
+            bgcolor: "transparent",
+            color: "#1A1A1B",
+            textTransform: "none",
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 700,
+            fontSize: "0.88rem",
+            border: "1px solid #EDEFF1",
+            borderRadius: 5,
+            py: 0.9,
+            mt: 1.25,
+            "&:hover": { bgcolor: "#F6F7F8", borderColor: "#D3D6DA" },
+          }}
+        >
+          Log Out
+        </Button>
+      )}
+    </Box>
+  </>
+);
 }

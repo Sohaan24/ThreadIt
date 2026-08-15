@@ -19,7 +19,8 @@ function App() {
         rtl={false}
         pauseOnFocusLoss
         pauseOnHover
-        theme="light"
+        theme="colored"
+       
       />
       <Routes>
         <Route element={<MainLayout />}>

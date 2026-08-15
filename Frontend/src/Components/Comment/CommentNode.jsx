@@ -41,7 +41,14 @@ export default function CommentNode({ comment, onReplyAdded, depth= 0 , onCommen
   }
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{
+      width: "100%",
+      bgcolor: depth === 0 ? "#FFFFFF" : "transparent",
+      border: depth === 0 ? "1px solid #EDEFF1" : "none",
+      borderRadius: depth === 0 ? 2 : 0,
+      p: depth === 0 ? 1.5 : 0,
+      mb: depth === 0 ? 1 : 0,
+    }}>
       <Box sx={{ display: "flex", gap: 1 }}>
       
   
