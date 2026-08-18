@@ -51,8 +51,8 @@ export default function Sidebar() {
           onClick={handleLogout}
           startIcon={<LogOut size={16} />}
           sx={{
-            bgcolor: "transparent",
-            color: "#1A1A1B",
+            bgcolor: "#1A1A1B",
+            color: "#F3F4F6", 
             textTransform: "none",
             fontFamily: "'Inter', sans-serif",
             fontWeight: 700,
@@ -61,7 +61,7 @@ export default function Sidebar() {
             borderRadius: 5,
             py: 0.9,
             mt: 1.25,
-            "&:hover": { bgcolor: "#F6F7F8", borderColor: "#D3D6DA" },
+            "&:hover": { bgcolor: "#F6F7F8", borderColor: "#D3D6DA",color : "#1A1A1B" },
           }}
         >
           Log Out
