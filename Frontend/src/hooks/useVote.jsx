@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import api from "../Components/axiosConfig";
 import { MyContext } from "../Components/MyContext";
 import {toast} from "react-toastify" ;
+import {socket} from "../utils/socket"
 export default function useVote(post) {
   const { user } = useContext(MyContext);
 
@@ -22,11 +23,29 @@ export default function useVote(post) {
     if (!user) {
       setHasUp(false);
       setHasDown(false);
-      return;
+      
+    }else {
+      setHasUp(post.upvotedBy.includes(user.id) ?? false);
+      setHasDown(post.downvotedBy.includes(user.id) ?? false);
     }
 
-    setHasUp(post.upvotedBy.includes(user.id) ?? false);
-    setHasDown(post.downvotedBy.includes(user.id) ?? false);
+
+    const handleVoteUpdate = (voteData)=> {
+    
+      if (voteData.postId === post._id) {
+        setUpvoteCount(voteData.upvoteCount);
+        setDownvoteCount(voteData.downvoteCount);
+      }
+
+      
+      
+    }
+
+    socket.on("updated-vote", handleVoteUpdate); 
+      return () => {
+      socket.off("updated-vote", handleVoteUpdate);
+    };
+    
   }, [post, user]);
 
   const handleVote = async (type) => {
@@ -77,6 +96,13 @@ export default function useVote(post) {
       setDownvoteCount(data.downvoteCount);
       setHasUp(data.hasUpvoted);
       setHasDown(data.hasDownvoted);
+
+      socket.emit("updated-vote", {
+        upvoteCount : data.upvoteCount ,
+        downvoteCount : data.downvoteCount,
+        postId : post._id 
+      }) ;
+      
     } catch (error) {
       console.log("failed to update votes", error);
 

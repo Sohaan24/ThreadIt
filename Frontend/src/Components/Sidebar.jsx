@@ -33,7 +33,7 @@ export default function Sidebar() {
           color: "#FFFFFF",
           textTransform: "none",
           fontFamily: "'Inter', sans-serif",
-          fontWeight: 700,
+          fontWeight: 600,
           fontSize: "0.88rem",
           borderRadius: 5,
           py: 0.9,

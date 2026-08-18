@@ -3,6 +3,7 @@ import api from "./axiosConfig";
 import { MyContext } from "./MyContext";
 import { useNavigate } from "react-router-dom";
 import {toast} from "react-toastify" ;
+import {socket} from "../utils/socket" ;
 
 import {
   Card,
@@ -35,6 +36,8 @@ export default function PostPage({ post, onDelete }) {
    
     try {
       await api.delete(`/api/post/delete/${post._id}`);
+   
+      socket.emit("delete-post", post._id) ;
       onDelete(post._id);
       toast.success("Post Deleted Succesfully") ;
     } catch (error) {

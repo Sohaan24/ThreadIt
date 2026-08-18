@@ -18,6 +18,7 @@ import TextFieldsIcon from "@mui/icons-material/TextFields";
 import * as Yup from "yup";
 import api from "./axiosConfig";
 import {toast} from "react-toastify" ;
+import {socket} from "../utils/socket"
 
 export default function CreatePost() {
   const { user } = useContext(MyContext);
@@ -168,11 +169,12 @@ export default function CreatePost() {
               if (values.image) formData.append("image", values.image);
 
               try {
-                await api.post("/api/post/createPost", formData);
+                const response = await api.post("/api/post/createPost", formData);
+                socket.emit("post-created", response.data.post) ;
                 resetForm();
                 setPreviewUrl(null);
                 setActiveTab("text");
-                toast.success("Post Created Succesfully")
+                toast.success("Post Created Succesfully") ;
                 navigate("/") ;
               } catch (err) {
                 console.log("Failed to create Post", err);

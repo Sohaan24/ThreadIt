@@ -4,6 +4,7 @@ import { MyContext } from "../MyContext";
 import { Box, Avatar, TextField, Button, CircularProgress, Typography } from "@mui/material";
 import { Send } from "lucide-react";
 import useHelper from "../../utils/useHelper";
+import {socket} from "../../utils/socket"
 
 export default function CommentForm({ postId, parentId = null, onCommentAdded,initialText = "", isEditMode = false, onSubmit, onCancel }) {
   const { user } = useContext(MyContext);
@@ -41,6 +42,11 @@ export default function CommentForm({ postId, parentId = null, onCommentAdded,in
           text: text.trim(),
         });
         onCommentAdded?.(res.data);
+        socket.emit("new-comment",{
+          postId ,
+          parentId,
+          comment : res.data 
+        })
         setText("");
         setFocused(false);
       }

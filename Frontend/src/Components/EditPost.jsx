@@ -18,6 +18,7 @@ import * as Yup from "yup";
 import api from "./axiosConfig";
 import {MyContext} from "./MyContext";
 import {toast} from "react-toastify" ;
+import {socket} from "../utils/socket" ;
 
 export default function EditPost() {
 
@@ -31,6 +32,7 @@ export default function EditPost() {
         try {
             const response = await api.get(`/api/post/getPost/${postId}`) ;
             setPost(response.data.post) ;
+            socket.emit("post-edited",response.data.post) ;
         }catch(err) {
             console.log("failed in edit post :", err) ;
         }

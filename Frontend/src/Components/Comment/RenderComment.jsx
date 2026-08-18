@@ -1,8 +1,9 @@
 import api from "../axiosConfig";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import CommentNode from "./CommentNode";
 import CommentForm from "./CommentForm";
 import { Box } from "@mui/material";
+import {socket} from "../../utils/socket";
 
 export default function RenderComment({ postId }) {
   const [postComments, setPostComments] = useState([]);
@@ -20,7 +21,8 @@ export default function RenderComment({ postId }) {
   }, [postId]);
 
 
-  const handleCommentAdded = (parentId, newComment) => {
+
+  const handleCommentAdded = useCallback((parentId, newComment) => {
 
     const actualComment = newComment || parentId;
     const actualParentId = newComment ? parentId : null;
@@ -57,7 +59,36 @@ export default function RenderComment({ postId }) {
 
       return insertReplyIntoTree(prevComments);
     });
-  };
+  }, []);
+
+  const handleEdit = useCallback((commentId, newText)=> {
+    setPostComments((prevComments)=> {
+
+      const updateCommentInTree = (commentList)=> {
+
+        return commentList.map((c)=> {
+
+          if(c._id == commentId) {
+            return {
+              ...c,
+              text : newText ,
+              isEdited : true 
+            }
+          }
+
+          if(c.replies.length && c.replies.length > 0) {
+            return{
+              ...c,
+              replies : updateCommentInTree(c.replies) 
+            } 
+          }
+          return c ;
+        })
+      }
+
+      return updateCommentInTree(prevComments) ;
+    })
+  },[]) ;
 
   const handleDelete = (commentId)=> {
     setPostComments((prevComments)=> {
@@ -87,35 +118,38 @@ export default function RenderComment({ postId }) {
     });
   }
 
-  const handleEdit = (commentId, newText)=> {
-    setPostComments((prevComments)=> {
 
-      const updateCommentInTree = (commentList)=> {
+  useEffect(()=> {
+    if(!postId) return ;
 
-        return commentList.map((c)=> {
+    socket.emit("join the room", postId) ;
 
-          if(c._id == commentId) {
-            return {
-              ...c,
-              text : newText ,
-              isEdited : true 
-            }
-          }
+    const onCommentAdded = (data) => {
+      handleCommentAdded(data.parentId, data.comment) 
+    }
 
-          if(c.replies.length && c.replies.length > 0) {
-            return{
-              ...c,
-              replies : updateCommentInTree(c.replies) 
-            } 
-          }
-          return c ;
-        })
-      }
+    const onCommentEdited = (data)=> {
+      handleEdit(data.commentId, data.text) ;
+    }
 
-      return updateCommentInTree(prevComments) ;
-    })
-  }
+    const onCommentDeleted = (data)=> {
+      handleDelete(data.commentId) ;
+    }
 
+    socket.on("comment-added",onCommentAdded) ;
+    socket.on("edit-comment",onCommentEdited ) ;
+    socket.on("delete-comment", onCommentDeleted) ;
+
+    return ()=> {
+      socket.off("comment-added", onCommentAdded) ;
+      socket.emit("leave room", postId) ;
+      socket.off("edit-comment", onCommentEdited) ;
+      socket.off("delete-comment", onCommentDeleted) ;
+    }
+    
+  },[postId, handleCommentAdded,handleEdit]) ;
+
+  
   return (
     <Box sx={{ mt: 3 }}>
      

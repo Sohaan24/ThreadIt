@@ -9,6 +9,7 @@ export const MyProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState(null);
+  const [query, setQuery] = useState("") ;
 
   const handleAuthentication = async (formData, isLoginMode) => {
     setIsLoading(true);
@@ -57,6 +58,8 @@ export const MyProvider = ({ children }) => {
     handleLogout,
     error,
     user,
+    query,
+    setQuery
   };
 
   return (

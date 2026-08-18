@@ -5,6 +5,7 @@ import useHelper from "../../utils/useHelper";
 import CommentForm from "./CommentForm" ;
 import useCommentVote from "../../hooks/useCommentVote" ;
 import api from "../axiosConfig" ;
+import {socket} from "../../utils/socket" ;
 import {
   ArrowBigUp,
   ArrowBigDown,
@@ -35,6 +36,11 @@ export default function CommentNode({ comment, onReplyAdded, depth= 0 , onCommen
     try{
         await api.patch(`/api/comment/deleteThread/${comment._id}`) ;
         onCommentDeleted(comment._id);
+
+        socket.emit("delete-comment", {
+          postId : comment.postId ,
+          commentId : comment._id ,
+        }) 
     }catch(err) {
       console.log("Error in deleting comment", err) ;
     } 
@@ -123,6 +129,11 @@ export default function CommentNode({ comment, onReplyAdded, depth= 0 , onCommen
             await api.patch(`/api/comment/updateThread/${comment._id}`,{text : newText}) ;
 
             onCommentEdited(comment._id, newText);
+            socket.emit("edit-comment", {
+              postId : comment.postId,
+              commentId : comment._id ,
+              text : newText  
+            })
             setIsEditing(false);
           }}
           onCancel={() => setIsEditing(false)}
