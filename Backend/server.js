@@ -93,7 +93,7 @@ io.on("connection", (socket)=> {
   })
 });
 
-const port = PORT || 7860
+const port = PORT || 7860 ;
 
 async function main() {
   try {
