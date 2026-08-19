@@ -93,14 +93,16 @@ io.on("connection", (socket)=> {
   })
 });
 
+const port = PORT || 7860
+
 async function main() {
   try {
     await mongoose.connect(dbURL); 
     console.log("Connected to MongoDB Atlas successfully");
 
     
-    server.listen(PORT, () => {
-      console.log(`Server is running on ${PORT}`);
+    server.listen(port, () => {
+      console.log(`Server is running on ${port}`);
     });
     
 
